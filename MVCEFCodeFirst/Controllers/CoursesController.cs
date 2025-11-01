@@ -59,6 +59,7 @@ namespace MVCEFCodeFirst.Controllers
             {
                 if (ModelState.IsValid)
                 {
+                    course.Active = true;
                     _context.Add(course);
                      await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
