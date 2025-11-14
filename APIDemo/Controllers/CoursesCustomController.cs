@@ -1,4 +1,6 @@
 ﻿using APIDemo.Models;
+using APIDemo.Models.Request;
+using APIDemo.Models.Response;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +21,36 @@ namespace APIDemo.Controllers
 
 
         [HttpGet]
-        public  IEnumerable<Course> GetAll()
+        public  IEnumerable<CourseResponseV2> GetMarketing()
         {
-            return _context.Courses.ToList();
+            var courses= _context.Courses.ToList();
+
+            //entity a response
+            var response= courses.Select(c => new CourseResponseV2
+            {
+                CourseId = c.CourseID,
+                Course = c.Name
+            }).ToList();
+
+            return response;
         }
 
+
+        [HttpGet]
+        public IEnumerable<CourseResponse> GetAcademic()
+        {
+            var courses = _context.Courses.ToList();
+
+            //entity a response
+            var response = courses.Select(c => new CourseResponse
+            {
+                CourseId = c.CourseID,
+                Course = c.Name,
+                Credit=c.Credit
+            }).ToList();
+
+            return response;
+        }
 
         [HttpGet]
         public IEnumerable<Course> GetByName(string name)
@@ -34,10 +61,18 @@ namespace APIDemo.Controllers
         }
 
         [HttpPost]
-        public string Insert(Course course)
+        public string Insert(CourseRequest request)
         {
             try
-            {             
+            {
+                //Convert request to entity
+                Course course = new Course
+                {
+                    Credit = request.Credit,
+                    Name = request.Name,
+                    Active = true                    
+                };
+
                 _context.Courses.Add(course);
                 _context.SaveChanges();
                 return "Registro exitoso";
