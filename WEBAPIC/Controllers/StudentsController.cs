@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WEBAPIC.Models;
+using WEBAPIC.Request;
+using WEBAPIC.Response;
 
 namespace WEBAPIC.Controllers
 {
@@ -17,18 +19,33 @@ namespace WEBAPIC.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Student> GetAll()
+        public IEnumerable<StudentResponseGet> GetAll()
         {            
-            var students = _context.Students.ToList();         
-            return students;
+            var students = _context.Students.Where(x=>x.Active==true).ToList();
+
+            var response = students.Select(s => new StudentResponseGet
+            {
+                StudentID = s.StudentID,
+                FirstName = s.FirstName,
+                LastName = s.LastName
+            });
+
+            return response;
         }
 
         [HttpPost]
-        public void Insert(Student student)
+        public void Insert(StudentRequestInsert request)
         {
+
+            Student student = new Student
+            {
+                Email = request.Email,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Active = true
+            };
             _context.Students.Add(student);
             _context.SaveChanges();
-
         }
     }
 }
